@@ -1,0 +1,30 @@
+name: Windows Tests
+
+on: [push, pull_request]
+
+jobs:
+  pest-tests:
+    runs-on: windows-latest
+
+    # This is the "Magic" part
+    strategy:
+      fail-fast: false # Don't stop 8.2 tests if 8.1 fails
+      matrix:
+        php-version: ['8.3']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }} # Uses the version from the matrix
+          extensions: mbstring
+          coverage: none
+
+      - name: Install Dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Run Pest Tests
+        run: vendor/bin/pest

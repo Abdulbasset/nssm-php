@@ -1,0 +1,39 @@
+{
+    "name": "abdulbasset/nssm-php",
+    "description": "PHP Wrapper for nssm - the Non-Sucking Service Manager",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Abdulbasset\\NssmPhp\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Abdulbasset\\NssmPhp\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "AA1992",
+            "email": "abdulbasset.nasser.92@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.3",
+        "symfony/process": "^7.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^4.4"
+    },
+    "scripts": {
+        "test": "pest",
+        "test-coverage": "pest --coverage"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
