@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false # Don't stop 8.2 tests if 8.1 fails
       matrix:
-        php-version: ['8.3']
+        php-version: ['8.3', '8.4', '8.5']
 
     steps:
       - name: Checkout code
@@ -19,7 +19,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }} # Uses the version from the matrix
+          php-version: ${{ matrix.php-version }}
           extensions: mbstring
           coverage: none
 
