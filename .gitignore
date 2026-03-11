@@ -25,5 +25,4 @@ yarn-error.log
 .php-cs-fixer.cache
 
 # Misc
-phpunit.xml
 phpstan.neon
