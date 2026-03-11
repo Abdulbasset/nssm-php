@@ -7,7 +7,7 @@ A lightweight PHP wrapper for [NSSM](https://nssm.cc/) (the Non-Sucking Service 
 You can install the package via composer:
 
 ```bash
-composer require aa1992/nssm-php
+composer require abdulbasset/nssm-php
 ```
 
 ## Requirements
