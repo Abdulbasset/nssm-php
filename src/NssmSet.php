@@ -81,4 +81,22 @@ class NssmSet
 
         return $this;
     }
+
+    public function rotation(false|null|\Closure $callback = null): self
+    {
+        $rotation = new NssmRotation($this->command, $this->executor);
+
+        if ($callback === false) {
+            $rotation->stop();
+            return $this;
+        }
+
+        $rotation->enable();
+
+        if ($callback instanceof \Closure) {
+            $callback->call($this, $rotation);
+        }
+
+        return $this;
+    }
 }

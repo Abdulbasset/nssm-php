@@ -12,7 +12,7 @@ composer require abdulbasset/nssm-php
 
 ## Requirements
 
-- PHP 8.2 or higher
+- PHP 8.3 or higher
 - [NSSM](https://nssm.cc/download) binary must be available in your system's PATH, or you can specify the path to the binary manually.
 
 ## Usage
@@ -70,6 +70,38 @@ $nssm->set(function (NssmSet $set) {
 });
 ```
 
+### Log Rotation
+
+You can configure log rotation for stdout and stderr files. By default, enabling rotation will rotate files when the service starts or restarts.
+
+```php
+use Abdulbasset\NssmPhp\Nssm;
+use Abdulbasset\NssmPhp\NssmSet;
+use Abdulbasset\NssmPhp\NssmRotation;
+
+$nssm = new Nssm('MyService');
+
+$nssm->set(function (NssmSet $set) {
+    // Basic rotation (enables AppRotateFiles)
+    $set->rotation();
+
+    // Advanced rotation configuration
+    $set->rotation(function (NssmRotation $rotation) {
+        // Rotate every 1 hour (accepts seconds or DateInterval)
+        $rotation->everySeconds(new \DateInterval('PT1H'));
+
+        // Rotate when file size exceeds 1 MB (in bytes)
+        $rotation->everyBytes(1024 * 1024);
+
+        // Enable rotation while the service is running (online rotation)
+        $rotation->online();
+    });
+});
+
+// To disable rotation
+$nssm->set(fn(NssmSet $set) => $set->rotation(false));
+```
+
 ### Get Service Status
 
 The `status()` method returns an instance of the `Abdulbasset\NssmPhp\Status` enum, or `null` if the status is unknown.
@@ -89,6 +121,44 @@ if ($status === Status::Running) {
 if ($status?->running()) { ... }
 if ($status?->pending()) { ... } // Returns true for StartPending or StopPending
 if ($status?->exists()) { ... }  // Returns true if the service exists (not NotFound)
+```
+
+### Full Example
+
+Here's a comprehensive example of how to install, configure, and manage a Windows service (Running Octane Server for example):
+
+```php
+use Abdulbasset\NssmPhp\Nssm;
+use Abdulbasset\NssmPhp\NssmSet;
+use Abdulbasset\NssmPhp\NssmRotation;
+use Abdulbasset\NssmPhp\Startup;
+use Abdulbasset\NssmPhp\Status;
+
+$nssm = new Nssm('MyAppOctaneServer');
+
+$nssm->bin(PHP_BINARY)
+    ->install(
+        base_path('artisan'),
+        'octane:start',
+        '--quiet',
+        '--port:8000'
+    )
+    ->set(fn(NssmSet $set) => $set
+        ->displayName(config('app.name') . ' Octane Server')
+        ->description('High-performance HTTP server for Laravel using ' . config('octane.driver') . '.')
+        ->startup(Startup::Delayed)
+        ->appDirectory(base_path())
+        ->error(storage_path('logs/octane-err.log'))
+        ->output(storage_path('logs/octane-out.log'))
+        ->rotation()// enable it on service start/restart
+        ->rotation(false) // disable rotation
+        ->rotation(function (NssmRotation $rotation) {
+            $rotation
+                ->online()
+                ->everySeconds(\Carbon\CarbonInterval::minutes(2))
+                ->everyBytes(64 * 1024);
+        })
+    );
 ```
 
 ### Custom NSSM Binary Path
